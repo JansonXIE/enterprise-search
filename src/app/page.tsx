@@ -5,7 +5,15 @@ import { useChat } from '@ai-sdk/react';
 import { Search, ArrowRight, Loader2, Database } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { useEffect, useRef, useState } from 'react';
+
+// 将 [Document X] 和 [Document X, Y, Z] 引用转换为上标，并简化为 [X] / [X, Y, Z]
+function formatDocRefs(text: string): string {
+  return text
+    .replace(/\[Document\s+([\d,\s]+)\]/g, (_match, nums) => `<sup class="doc-ref">[${nums.replace(/\s+/g, ' ').trim()}]</sup>`)
+    .replace(/\[Document\s+(\d+)\]/g, (_match, num) => `<sup class="doc-ref">[${num}]</sup>`);
+}
 
 export default function Home() {
   const { messages, sendMessage, status } = useChat();
@@ -63,8 +71,8 @@ export default function Home() {
                   </h2>
                 ) : (
                   <div className="markdown-content text-gray-800 dark:text-gray-200">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {typeof m.content === 'string' ? m.content : m.parts?.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('')}
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                      {formatDocRefs(typeof m.content === 'string' ? m.content : m.parts?.filter((p: any) => p.type === 'text').map((p: any) => p.text).join(''))}
                     </ReactMarkdown>
                   </div>
                 )}

@@ -94,6 +94,16 @@ body {
   padding: 0;
   color: inherit;
 }
+.markdown-content sup.doc-ref {
+  font-size: 0.7em;
+  color: #6b7280;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 1px;
+}
+.dark .markdown-content sup.doc-ref {
+  color: #9ca3af;
+}
 .markdown-content blockquote {
   border-left-width: 4px;
   border-color: #d1d5db;
