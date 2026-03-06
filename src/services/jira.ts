@@ -7,17 +7,7 @@ export interface SearchResult {
 }
 
 export async function searchJira(query: string): Promise<SearchResult[]> {
-  // TODO: Replace with real Jira REST API call
-  // Example for Jira Cloud:
-  // const res = await fetch(`https://YOUR_DOMAIN.atlassian.net/rest/api/2/search?jql=text ~ "${query}"`, {
-  //   headers: {
-  //     'Authorization': `Basic ${Buffer.from('email:api_token').toString('base64')}`,
-  //     'Accept': 'application/json'
-  //   }
-  // });
-  // const data = await res.json();
-
-  // Simulated network delay
+  // 模拟数据 (暂未接入真实 Jira API)
   await new Promise((resolve) => setTimeout(resolve, 800));
 
   console.log(`[Jira] Searching for: ${query}`);

@@ -5,11 +5,14 @@ import { useChat } from '@ai-sdk/react';
 import { Search, ArrowRight, Loader2, Database } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat();
+  const { messages, sendMessage, status } = useChat();
+  const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isLoading = status === 'submitted' || status === 'streaming';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,6 +23,13 @@ export default function Home() {
   }, [messages]);
 
   const hasMessages = messages.length > 0;
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
+    setInput('');
+  };
 
   return (
     <main className="flex min-h-screen flex-col font-sans">
@@ -49,12 +59,12 @@ export default function Home() {
               <div key={m.id} className="flex flex-col">
                 {m.role === 'user' ? (
                   <h2 className="text-2xl font-semibold mb-2 text-black dark:text-white">
-                    {m.content}
+                    {typeof m.content === 'string' ? m.content : m.parts?.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('')}
                   </h2>
                 ) : (
                   <div className="markdown-content text-gray-800 dark:text-gray-200">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {m.content}
+                      {typeof m.content === 'string' ? m.content : m.parts?.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('')}
                     </ReactMarkdown>
                   </div>
                 )}
@@ -79,7 +89,7 @@ export default function Home() {
               className="w-full py-5 pl-14 pr-16 bg-transparent outline-none text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               placeholder="Ask anything..."
               value={input}
-              onChange={handleInputChange}
+              onChange={(e) => setInput(e.target.value)}
             />
             <button
               type="submit"
@@ -100,7 +110,7 @@ export default function Home() {
                  <button 
                   key={suggestion}
                   type="button"
-                  onClick={() => handleInputChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>)}
+                  onClick={() => setInput(suggestion)}
                   className="px-4 py-2 bg-gray-100/80 hover:bg-gray-200 dark:bg-gray-800/80 dark:hover:bg-gray-700 text-sm rounded-full text-gray-700 dark:text-gray-300 transition-all cursor-pointer border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
                  >
                    {suggestion}

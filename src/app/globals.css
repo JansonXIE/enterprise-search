@@ -5,13 +5,6 @@
   --color-foreground: #111111;
 }
 
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-background: #0a0a0a;
-    --color-foreground: #fcfcfc;
-  }
-}
-
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
