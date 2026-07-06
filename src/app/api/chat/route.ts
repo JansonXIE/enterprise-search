@@ -1,6 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText, UIMessage } from 'ai';
-import { searchJira } from '@/services/jira';
 import { searchConfluence } from '@/services/confluence';
 
 // 使用 DeepSeek (兼容 OpenAI 接口)
@@ -40,29 +39,27 @@ export async function POST(req: Request) {
     const query = extractText(lastMessage);
 
     console.log('[API] Received query:', query);
-    
-    // 1. Fetch data from internal systems concurrently
-    const [jiraResults, confluenceResults] = await Promise.all([
-      searchJira(query),
-      searchConfluence(query)
-    ]);
-    
-    const allResults = [...jiraResults, ...confluenceResults];
-    
+
+    // 1. Fetch data from internal Confluence (wiki)
+    const allResults = await searchConfluence(query);
+
+    console.log(`[API] Confluence results: ${allResults.length}`);
+    console.log('[API] Confluence titles:', allResults.map((r) => r.title));
+
     // 2. Build the context text
     let contextText = "No relevant documents found.";
     if (allResults.length > 0) {
       contextText = allResults.map((r, i) => `[Document ${i + 1}] Source: ${r.source.toUpperCase()}\nTitle: ${r.title}\nURL: ${r.url}\nContent: ${r.content}`).join('\n\n');
     }
-    
+
     const systemPrompt = `You are a helpful, intelligent enterprise knowledge assistant. 
-Your primary task is to answer the user's question based strictly on the provided context retrieved from internal Jira and Confluence systems.
+Your primary task is to answer the user's question based strictly on the provided context retrieved from the internal Confluence (wiki) system.
 
 Context:
 ${contextText}
 
 Guidelines:
-1. If the answer is not contained in the Context, directly state that you cannot find the information in the internal systems.
+1. If the answer is not contained in the Context, directly state that you cannot find the information in the internal wiki.
 2. Structure your answer using markdown for readability.
 3. VERY IMPORTANT: You MUST cite your sources. When you use information from a Document, append a citation like [Document X] inline. At the very end of your response, list the references with their URLs formatted as markdown links.`;
 

@@ -56,7 +56,7 @@ export default function Home() {
               What do you want to know?
             </h1>
             <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-              Search across internal Jira specs, Confluence documentation, and company knowledge using natural language.
+              Search across internal Confluence documentation and company knowledge using natural language.
             </p>
           </div>
         )}
@@ -82,7 +82,7 @@ export default function Home() {
             {isLoading && (
                <div className="flex items-center gap-3 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-900/50">
                  <Loader2 className="w-5 h-5 animate-spin" />
-                 <span className="font-medium">Searching Confluence & Jira, summarizing results...</span>
+                 <span className="font-medium">Searching Confluence, summarizing results...</span>
                </div>
             )}
             <div ref={messagesEndRef} />
